@@ -6,6 +6,8 @@ import java.util.Random;
 
 import enums.Direction;
 import enums.GridSize;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Snake extends Observable implements Runnable {
 
@@ -26,12 +28,30 @@ public class Snake extends Observable implements Runnable {
     private boolean isSelected = false;
     private int growing = 0;
     public boolean goal = false;
+    public boolean isLocked = false;
+    public Object locker = new Object();
 
     public Snake(int idt, Cell head, int direction) {
         this.idt = idt;
         this.direction = direction;
         generateSnake(head);
 
+    }
+    /**
+     * 
+     */
+    public void lock(){
+        isLocked = true;
+    }
+
+    /**
+     * 
+     */
+    public void unlock(){
+        synchronized(locker){
+            locker.notify();
+        }
+        isLocked = false;
     }
 
     public boolean isSnakeEnd() {
@@ -48,23 +68,29 @@ public class Snake extends Observable implements Runnable {
     @Override
     public void run() {
         while (!snakeEnd) {
-            
-            snakeCalc();
-
-            //NOTIFY CHANGES TO GUI
-            setChanged();
-            notifyObservers();
-
-            try {
-                if (hasTurbo == true) {
-                    Thread.sleep(500 / 3);
-                } else {
-                    Thread.sleep(500);
+            if(!isLocked){
+                snakeCalc();
+                //NOTIFY CHANGES TO GUI
+                setChanged();
+                notifyObservers();
+                try {
+                    if (hasTurbo == true) {
+                        Thread.sleep(50);
+                    } else {
+                        Thread.sleep(500);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            }else{
+                synchronized(locker){
+                    try {
+                        locker.wait();
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(Snake.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
             }
-
         }
         
         fixDirection(head);

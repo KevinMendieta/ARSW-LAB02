@@ -1,0 +1,7 @@
+Condiciones de carrera:
+    Si dos snakes llegan al tiempo a un consumible (food, turbo).
+
+Mal uso de estructuras de datos:
+    Modificacion concurrente de la linked list
+Esperas Activas:
+
