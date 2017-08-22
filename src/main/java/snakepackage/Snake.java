@@ -28,8 +28,8 @@ public class Snake extends Observable implements Runnable {
     private boolean isSelected = false;
     private int growing = 0;
     public boolean goal = false;
-    public boolean isLocked = false;
-    public Object locker = new Object();
+    private boolean isLocked = false;
+    private SnakeApp locker;
 
     public Snake(int idt, Cell head, int direction) {
         this.idt = idt;
@@ -53,6 +53,14 @@ public class Snake extends Observable implements Runnable {
         }
         isLocked = false;
     }
+    
+    /**
+     * 
+     *
+     */
+    public void setLocker(SnakeApp locker){this.locker = locker;}
+    
+    public Object getLocker(){return locker;}
 
     public boolean isSnakeEnd() {
         return snakeEnd;
@@ -74,8 +82,8 @@ public class Snake extends Observable implements Runnable {
                 setChanged();
                 notifyObservers();
                 try {
-                    if (hasTurbo == true) {
-                        Thread.sleep(50);
+                    if (/*hasTurbo == */true) {
+                        Thread.sleep(10);
                     } else {
                         Thread.sleep(500);
                     }
@@ -92,7 +100,11 @@ public class Snake extends Observable implements Runnable {
                 }
             }
         }
-        
+        if(locker.increaseAndCheckDeadSnakes()){
+            synchronized(locker){
+                locker.notify();
+            }            
+        }
         fixDirection(head);
         
         

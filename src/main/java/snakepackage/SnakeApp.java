@@ -41,6 +41,7 @@ public class SnakeApp {
     Thread[] thread = new Thread[MAX_THREADS];
     private JButton startButton, pauseButton, resumeButton;
     private boolean started;
+    private int deadSnakes;
 
     public SnakeApp() {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -65,7 +66,17 @@ public class SnakeApp {
         actionsBPabel.add(resumeButton);
         frame.add(actionsBPabel,BorderLayout.SOUTH);
         started = false;
+        deadSnakes = 0;
         prepareActions();
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public synchronized boolean increaseAndCheckDeadSnakes(){
+        deadSnakes++;
+        return deadSnakes == MAX_THREADS;
     }
     
     public void prepareActions(){
@@ -117,10 +128,11 @@ public class SnakeApp {
             snakes[i] = new Snake(i + 1, spawn[i], i + 1);
             snakes[i].addObserver(board);
             thread[i] = new Thread(snakes[i]);
+            snakes[i].setLocker(this);
             //thread[i].start();
         }
         frame.setVisible(true);
-        while (true) {
+        /*while (true) {
             int x = 0;
             for (int i = 0; i != MAX_THREADS; i++) {
                 if (snakes[i].isSnakeEnd() == true) {
@@ -129,6 +141,13 @@ public class SnakeApp {
             }
             if (x == MAX_THREADS) {
                 break;
+            }
+        }*/
+        synchronized(this){
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                Logger.getLogger(SnakeApp.class.getName()).log(Level.SEVERE, null, e);
             }
         }
         System.out.println("Thread (snake) status:");
