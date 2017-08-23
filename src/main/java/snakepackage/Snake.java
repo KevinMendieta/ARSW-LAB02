@@ -6,6 +6,7 @@ import java.util.Random;
 
 import enums.Direction;
 import enums.GridSize;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,7 +15,8 @@ public class Snake extends Observable implements Runnable {
     private int idt;
     private Cell head;
     private Cell newCell;
-    private LinkedList<Cell> snakeBody = new LinkedList<Cell>();
+    //private LinkedList<Cell> snakeBody = new LinkedList<Cell>();
+    private ConcurrentLinkedDeque<Cell> snakeBody = new ConcurrentLinkedDeque<Cell>();
     //private Cell objective = null;
     private Cell start = null;
 
@@ -29,6 +31,7 @@ public class Snake extends Observable implements Runnable {
     private int growing = 0;
     public boolean goal = false;
     private boolean isLocked = false;
+    private boolean isFirstDead = false;
     private SnakeApp locker;
 
     public Snake(int idt, Cell head, int direction) {
@@ -56,9 +59,23 @@ public class Snake extends Observable implements Runnable {
     
     /**
      * 
-     *
+     * @param locker 
      */
     public void setLocker(SnakeApp locker){this.locker = locker;}
+    
+    /**
+     * 
+     * @param isFirstDead 
+     */
+    public void setFirstDead(boolean isFirstDead){this.isFirstDead = isFirstDead;}
+    
+    /**
+     * 
+     * @return 
+     */
+    public boolean isFirstDead(){return isFirstDead;}
+    
+    public Cell getHead(){return this.head;}
     
     public Object getLocker(){return locker;}
 
@@ -82,8 +99,8 @@ public class Snake extends Observable implements Runnable {
                 setChanged();
                 notifyObservers();
                 try {
-                    if (/*hasTurbo == */true) {
-                        Thread.sleep(10);
+                    if (hasTurbo) {
+                        Thread.sleep(500 / 3);
                     } else {
                         Thread.sleep(500);
                     }
@@ -100,7 +117,7 @@ public class Snake extends Observable implements Runnable {
                 }
             }
         }
-        if(locker.increaseAndCheckDeadSnakes()){
+        if(locker.increaseAndCheckDeadSnakes(this)){
             synchronized(locker){
                 locker.notify();
             }            
@@ -365,7 +382,11 @@ public class Snake extends Observable implements Runnable {
         this.objective = c;
     }*/
 
-    public LinkedList<Cell> getBody() {
+    /*public LinkedList<Cell> getBody() {
+        return this.snakeBody;
+    }*/
+    
+    public ConcurrentLinkedDeque<Cell> getBody() {
         return this.snakeBody;
     }
 

@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 
 import enums.GridSize;
+import java.awt.Font;
 import java.io.InputStream;
 
 public class Board extends JLabel implements Observer {
@@ -105,16 +106,16 @@ public class Board extends JLabel implements Observer {
 	}
 
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
+		super.paintComponent(g); 
 		drawGrid(g);
 		drawSnake(g);
 		drawFood(g);
 		drawBarriers(g);
 		drawJumpPads(g);
 		drawTurboBoosts(g);
+                                       
 	}
-
+          
 	private void drawTurboBoosts(Graphics g) {
 		Image light = null;
                 InputStream resource=ClassLoader.getSystemResourceAsStream("Img/lightning.png");

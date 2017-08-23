@@ -1,7 +1,16 @@
 Condiciones de carrera:
-    Si dos snakes llegan al tiempo a un consumible (food, turbo).
-
+    1. Si dos snakes llegan al tiempo a un consumible (food, turbo).
+    Solucion:
 Mal uso de estructuras de datos:
-    Modificacion concurrente de la linked list
+    1. Modificacion concurrente en la coleccion no concurrente (linked list).
+    Solucion: Cambiar la coleccion no concurrente (LinkedList), por una concurrente
+    (ConcurrentLinkedDeque).
 Esperas Activas:
-
+    1. Espera activa para no terminar la ejecucion antes de que se mueran todas las
+    serpientes.
+    Solucion: Hacer que la aplicacion de snake (SnakeApp), se ponga a esperar a que
+    la ultima serpiente en morir lo notifique para seguir con la ejecucion, de esta
+    forma se evitan ciclos evaluando lo mismo. Para poder hacer esto se agrego un
+    contador a SnakeApp de la serpientes muertas, el cual se incrementa y evalua si
+    esa serpiente es la ultima, este incremento maneja concurrencia, en el caso de
+    que varias serpientes mueran al mismo tiempo.

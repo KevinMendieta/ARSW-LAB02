@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -74,7 +75,8 @@ public class SnakeApp {
      * 
      * @return 
      */
-    public synchronized boolean increaseAndCheckDeadSnakes(){
+    public synchronized boolean increaseAndCheckDeadSnakes(Snake snake){
+        if(deadSnakes == 0) snake.setFirstDead(true);
         deadSnakes++;
         return deadSnakes == MAX_THREADS;
     }
@@ -100,22 +102,53 @@ public class SnakeApp {
         });
     }
     
+    /**
+     * 
+     */
     public void start(){
         for (int i = 0; i < MAX_THREADS; i++){
             thread[i].start();
         }
     }
-    
+
+    /**
+     * 
+     */
     public void pause(){
         for (int i = 0; i < MAX_THREADS; i++){
             snakes[i].lock();
         }
+        showPauseInfo();
     }
-    
+
+    /**
+     * 
+     */
     public void resume(){
         for (int i = 0; i < MAX_THREADS; i++){
             snakes[i].unlock();
         }
+    }
+    
+    public void showPauseInfo(){
+        Snake worstSnake = null;
+        Snake bestSnake = snakes[0];
+        for (int i = 0; i < snakes.length; i++) {
+            if (snakes[i].isFirstDead()) {
+                worstSnake = snakes[i];
+            }
+            if (snakes[i].getBody().size() > bestSnake.getBody().size()) {
+                bestSnake = snakes[i];
+            }
+        }
+        String firstMessage, secondMessage;
+        if (worstSnake != null) {
+            firstMessage = "The worst Snake is on " + worstSnake.getHead().getX() + ", " + worstSnake.getHead().getY() + " cell.";
+        } else {
+            firstMessage = "No deads yet!";
+        }
+        secondMessage = "The best snake is on " + bestSnake.getHead().getX() + ", " + bestSnake.getHead().getY() + " cell with " + bestSnake.getBody().size() + " length!";
+        JOptionPane.showMessageDialog(null, firstMessage + "\n" + secondMessage, "InfoBox", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void main(String[] args) {
