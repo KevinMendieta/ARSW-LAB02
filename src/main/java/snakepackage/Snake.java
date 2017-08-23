@@ -41,14 +41,14 @@ public class Snake extends Observable implements Runnable {
 
     }
     /**
-     * 
+     * Put the current thread to wait.
      */
     public void lock(){
         isLocked = true;
     }
 
     /**
-     * 
+     * Notify the current thread to stop waiting.
      */
     public void unlock(){
         synchronized(locker){
@@ -58,20 +58,19 @@ public class Snake extends Observable implements Runnable {
     }
     
     /**
-     * 
+     * Sets the locker to the current class.
      * @param locker 
      */
     public void setLocker(SnakeApp locker){this.locker = locker;}
     
     /**
-     * 
-     * @param isFirstDead 
+     * set the property of the is first dead snake
+     * @param isFirstDead true if is the first snake dead otherwise false.
      */
     public void setFirstDead(boolean isFirstDead){this.isFirstDead = isFirstDead;}
     
     /**
-     * 
-     * @return 
+     * @return the property of is first dead snake. 
      */
     public boolean isFirstDead(){return isFirstDead;}
     
@@ -117,9 +116,9 @@ public class Snake extends Observable implements Runnable {
                 }
             }
         }
-        if(locker.increaseAndCheckDeadSnakes(this)){
-            synchronized(locker){
-                locker.notify();
+        if(SnakeApp.getApp().increaseAndCheckDeadSnakes(this)){
+            synchronized(SnakeApp.getApp().getLocker()){
+                SnakeApp.getApp().getLocker().notify();
             }            
         }
         fixDirection(head);
@@ -206,7 +205,7 @@ public class Snake extends Observable implements Runnable {
         }
     }
 
-    private void checkIfTurboBoost(Cell newCell) {
+    private synchronized void checkIfTurboBoost(Cell newCell) {
         if (Board.gameboard[newCell.getX()][newCell.getY()].isTurbo_boost()) {
             // get turbo_boost
             for (int i = 0; i != Board.NR_TURBO_BOOSTS; i++) {
@@ -222,7 +221,7 @@ public class Snake extends Observable implements Runnable {
         }
     }
 
-    private void checkIfJumpPad(Cell newCell) {
+    private synchronized void checkIfJumpPad(Cell newCell) {
 
         if (Board.gameboard[newCell.getX()][newCell.getY()].isJump_pad()) {
             // get jump_pad
@@ -239,7 +238,7 @@ public class Snake extends Observable implements Runnable {
         }
     }
 
-    private void checkIfFood(Cell newCell) {
+    private synchronized void checkIfFood(Cell newCell) {
         Random random = new Random();
 
         if (Board.gameboard[newCell.getX()][newCell.getY()].isFood()) {

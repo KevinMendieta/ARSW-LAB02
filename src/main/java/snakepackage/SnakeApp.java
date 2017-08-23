@@ -43,6 +43,7 @@ public class SnakeApp {
     private JButton startButton, pauseButton, resumeButton;
     private boolean started;
     private int deadSnakes;
+    private Object locker = new Object();
 
     public SnakeApp() {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -72,15 +73,19 @@ public class SnakeApp {
     }
     
     /**
-     * 
-     * @return 
+     * Increase the counter of the dead snakes concurrently and sets the property of the first snake dead and calculates if all snakes are dead.
+     * @param snake
+     * @return return true if all snakes are dead otherwise false. 
      */
     public synchronized boolean increaseAndCheckDeadSnakes(Snake snake){
         if(deadSnakes == 0) snake.setFirstDead(true);
         deadSnakes++;
         return deadSnakes == MAX_THREADS;
     }
-    
+
+    /**
+     * Prepare listeners for the action (starting, pausing and resuming).
+     */
     public void prepareActions(){
         startButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -103,7 +108,7 @@ public class SnakeApp {
     }
     
     /**
-     * 
+     * Start all the threads.
      */
     public void start(){
         for (int i = 0; i < MAX_THREADS; i++){
@@ -112,7 +117,7 @@ public class SnakeApp {
     }
 
     /**
-     * 
+     * Pause all the threads.
      */
     public void pause(){
         for (int i = 0; i < MAX_THREADS; i++){
@@ -122,7 +127,7 @@ public class SnakeApp {
     }
 
     /**
-     * 
+     * Resume all the threads.
      */
     public void resume(){
         for (int i = 0; i < MAX_THREADS; i++){
@@ -130,7 +135,10 @@ public class SnakeApp {
         }
     }
     
-    public void showPauseInfo(){
+    /**
+     * Use a component to show the pausing information.
+     */
+    private void showPauseInfo(){
         Snake worstSnake = null;
         Snake bestSnake = snakes[0];
         for (int i = 0; i < snakes.length; i++) {
@@ -150,6 +158,11 @@ public class SnakeApp {
         secondMessage = "The best snake is on " + bestSnake.getHead().getX() + ", " + bestSnake.getHead().getY() + " cell with " + bestSnake.getBody().size() + " length!";
         JOptionPane.showMessageDialog(null, firstMessage + "\n" + secondMessage, "InfoBox", JOptionPane.INFORMATION_MESSAGE);
     }
+    
+    /**
+     * @return the locker for this class
+     */
+    public Object getLocker(){return locker;}
 
     public static void main(String[] args) {
         app = new SnakeApp();
@@ -176,9 +189,9 @@ public class SnakeApp {
                 break;
             }
         }*/
-        synchronized(this){
+        synchronized(locker){
             try {
-                this.wait();
+                locker.wait();
             } catch (InterruptedException e) {
                 Logger.getLogger(SnakeApp.class.getName()).log(Level.SEVERE, null, e);
             }

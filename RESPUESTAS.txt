@@ -1,6 +1,11 @@
 Condiciones de carrera:
-    1. Si dos snakes llegan al tiempo a un consumible (food, turbo).
-    Solucion:
+    1. Si dos snakes llegan al tiempo a un consumible (food, turbo, jumpPad).
+	Regiones Criticas: Los metodos de cada una de las snakes que se encargan de 
+	calcular si la snake esta apunto de coger un consumible. 
+    Solucion: Sincronizar los metodos de Snake que claculculan
+	si la culebra esta sobre un osnsumible que pueda presentar este problema
+	(food, trubo, jumpPad), de esta forma solo se calcula por orden si esta cogiendo
+	alguno de estos consumibles.
 Mal uso de estructuras de datos:
     1. Modificacion concurrente en la coleccion no concurrente (linked list).
     Solucion: Cambiar la coleccion no concurrente (LinkedList), por una concurrente
